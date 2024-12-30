@@ -32,7 +32,7 @@ class LeafNode(HTMLNode):
         super().__init__(tag, value, children=None, props=props)
 
     def to_html(self):
-        if not self.value:
+        if not self.value and self.tag != "img":
             raise ValueError
         if not self.tag:
             return self.value
@@ -42,3 +42,19 @@ class LeafNode(HTMLNode):
     def __repr__(self):
         return f"LeafNode({self.tag}, {self.value}, {self.props})"
 
+class ParentNode(HTMLNode):
+    def __init__(self, tag, children, props=None):
+        super().__init__(tag, value=None, children=children, props=props)
+
+    def to_html(self):
+        if not self.tag:
+            raise ValueError("No tag associated with ParentNode")
+        if not self.children:
+            raise ValueError("No children associated with ParentNode")
+        string_to_print = ""
+        for child in self.children:
+            string_to_print += child.to_html()
+        return f"<{self.tag}{self.props_to_html()}>{string_to_print}</{self.tag}>"
+
+    def __repr__(self):
+        return f"ParentNode({self.tag}, children: {self.children}, {self.props})"
