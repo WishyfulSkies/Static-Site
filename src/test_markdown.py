@@ -1,7 +1,8 @@
 import unittest
 
-from markdown import text_to_textnodes, markdown_to_blocks, block_to_block_type
+from markdown import text_to_textnodes, markdown_to_blocks, block_to_block_type, markdown_to_html_node
 from textnode import TextNode, TextType
+from htmlnode import HTMLNode
 
 
 class TestTextToTextNodes(unittest.TestCase):
@@ -87,7 +88,31 @@ class TestBlockToBlockType(unittest.TestCase):
     def test_code(self):
         block = "``` Code stuffs   ```"
         result = block_to_block_type(block)
-        result = self.assertEqual("code", result)
+        self.assertEqual("code", result)
+
+class TestMarkdownToHTMLNode(unittest.TestCase):
+    def test_empty(self):
+        text = ""
+        result = markdown_to_html_node(text)
+        self.assertEqual(result, HTMLNode("div", None, [], None))
+
+    def test_simplepara(self):
+        text = "This is a paragraph"
+        result = markdown_to_html_node(text)
+        self.assertEqual(result, HTMLNode("div", None, [
+        HTMLNode("p", None, [TextNode("This is a paragraph", TextType.TEXT)])
+    ]))
+        
+    def test_unordered(self):
+        text = "- Item 1\n- Item 2"
+        result = markdown_to_html_node(text)
+        print(result)
+        self.assertEqual(result, HTMLNode("div", None, [
+        HTMLNode("ul", None, [
+            HTMLNode("li", None, [TextNode("Item 1", TextType.TEXT)]),
+            HTMLNode("li", None, [TextNode("Item 2", TextType.TEXT)])
+        ])
+    ]))
 
 if __name__ == "__main__":
     unittest.main()
